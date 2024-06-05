@@ -1,0 +1,4 @@
+All Projects created as follows:
+1. npm create vite@latest unicafe -- --template react
+2. npm install
+2. npm run dev
