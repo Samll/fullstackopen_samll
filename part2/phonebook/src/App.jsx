@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import NumberList from './components/NumberList'
-import axios from 'axios'
+import personRegister from './services/persons'
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -11,22 +11,49 @@ const App = () => {
   const [filterName, setFilterName] = useState('')
 
   useEffect(() => {
-    axios
-      .get("http://localhost:3001/persons")
-      .then(response => setPersons(response.data))
+    personRegister
+      .getAll()
+      .then(personsList => setPersons(personsList))
   },[])
 
   const addPerson = (event) => {
     event.preventDefault()
     const currentPersons = persons.map(p => p.name)
-    const newPerson = {"name":newName, "number":newNumber, "id": persons.length + 1} 
-    if (currentPersons.includes(newName) === false) {
-      setPersons(persons.concat(newPerson))
-      setNewName(""); 
-      setNewNumber(""); 
+    const newPerson = {"name":newName, "number":newNumber} 
+    if (!currentPersons.includes(newName)) {
+      personRegister
+        .create(newPerson)
+        .then(person => {
+          setPersons(persons.concat(person))
+          setNewName(""); 
+          setNewNumber(""); 
+        })
     }else{
-      alert(`${newName} already added to numberbook`)
+      if(window.confirm(`${newName} already added to numberbook. Do you want to change its Phone Number?`)){
+        const personToEdit = persons.find(p => p.name === newName)
+        const editedPerson = {...personToEdit, number: newNumber}
+        personRegister
+          .update(editedPerson.id,editedPerson)
+          .then(updatedPerson =>{
+            setPersons(persons.map(person => person.name === newName ? updatedPerson : person))
+            setNewName(""); 
+            setNewNumber(""); 
+          })
+      }
     }
+
+  }
+
+  const deletePerson = (id) => { 
+    const person = persons.find(p => p.id === id)
+    const message = `Do you really want do remove ${person.name}`
+    if(window.confirm(message)){
+      personRegister
+        .remove(id)
+        .then(response => {
+          setPersons(persons.filter(p => p.id !== id))
+        })
+      }
 
   }
 
@@ -53,7 +80,7 @@ const App = () => {
             newNumber={newNumber}
       />
       <h2>Numbers</h2>
-      <NumberList persons={persons} filter={filterName} />
+      <NumberList persons={persons} filter={filterName} deletePerson={deletePerson}/>
     </div>
   )
 }
