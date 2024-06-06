@@ -18,12 +18,12 @@
     {
       "id": "094a",
       "content": "Quiero que llegue Gisela",
-      "important": true
+      "important": false
     },
     {
       "id": "3fd8",
       "content": "Patas",
-      "important": false
+      "important": true
     },
     {
       "id": "e3cf",
