@@ -3,12 +3,15 @@ import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import NumberList from './components/NumberList'
 import personRegister from './services/persons'
+import NotificationHandler from './components/Notification'
 
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filterName, setFilterName] = useState('')
+  const [notificationMessage, setNotificationMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null)
 
   useEffect(() => {
     personRegister
@@ -27,6 +30,19 @@ const App = () => {
           setPersons(persons.concat(person))
           setNewName(""); 
           setNewNumber(""); 
+          setNotificationMessage(`${person.name} has been created`)
+          setTimeout(() => {
+            setNotificationMessage(null)
+    
+          }, 2000)
+        })
+        .catch(error => {
+          console.log(error)
+          setErrorMessage(`${newPerson.name} cannot be created`)
+          setTimeout(() => {
+            setErrorMessage(null)
+    
+          }, 5000)
         })
     }else{
       if(window.confirm(`${newName} already added to numberbook. Do you want to change its Phone Number?`)){
@@ -38,6 +54,19 @@ const App = () => {
             setPersons(persons.map(person => person.name === newName ? updatedPerson : person))
             setNewName(""); 
             setNewNumber(""); 
+            setNotificationMessage(`${editedPerson.name} has been updated`)
+            setTimeout(() => {
+              setNotificationMessage(null)
+      
+            }, 2000)
+          })
+          .catch(error => {
+            console.log(error)
+            setErrorMessage(`${editedPerson.name} cannot be edited, no longer existing in DB`)
+            setTimeout(() => {
+              setErrorMessage(null)
+      
+            }, 5000)
           })
       }
     }
@@ -52,6 +81,20 @@ const App = () => {
         .remove(id)
         .then(response => {
           setPersons(persons.filter(p => p.id !== id))
+          setNotificationMessage(`${person.name} has been deleted`)
+          setTimeout(() => {
+            setNotificationMessage(null)
+    
+          }, 2000)
+        })
+        .catch(error => {
+          console.log(error)
+          setErrorMessage(`${person.name} no longer existing in DB`)
+          setTimeout(() => {
+            setErrorMessage(null)
+    
+          }, 5000)
+
         })
       }
 
@@ -69,7 +112,9 @@ const App = () => {
 
   return (
     <div>
-      <h2>Numberbook</h2>
+      <h1>Mi Agenda de Teléfono</h1>
+      <NotificationHandler.Notification message={notificationMessage} />
+      <NotificationHandler.ErrorMessage message={errorMessage} />
       <Filter onChange={handleOnChangeFilterName} value={filterName} />
       <h3>Add a new person</h3>
       <PersonForm 
