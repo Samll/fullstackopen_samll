@@ -1,0 +1,8 @@
+POST http://localhost:3001/api/notes
+Content-Type: application/json
+
+{
+    "content": "Hello auto note generated",
+    "important": true,
+    "time": "Sat, 15 Jun 2024 01:02:03 GMT"
+}
