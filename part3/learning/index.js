@@ -1,5 +1,7 @@
 const express = require('express')
 const app = express()
+const cors = require('cors')
+app.use(cors())
 
 
 
@@ -11,13 +13,8 @@ const requestLogger = (request, response, next) => {
   next()
 }
 
-const unknownEndpoint = (request, response) => {
-  response.status(404).send({error:"Unknown endpoint"})
-}
-
 app.use(express.json())
 app.use(requestLogger)
-app.use(unknownEndpoint)
 
 let notes = [
   {
@@ -74,6 +71,33 @@ app.post('/api/notes', (request, response) => {
   response.json(note)
 })
 
+app.put('/api/notes/:id', (request, response) => {
+  const body = request.body
+
+  if (!body.content) {
+    return response.status(400).json({ 
+      error: 'content missing' 
+    })
+  }
+
+  const id = Number(request.params.id) 
+  const n = notes.filter(note => note.id === id)
+  if (!n){
+    return response.status(400).json({
+      error: 'note ID not existing in database'
+    })
+  }
+  console.log(n.id)
+  const newNote = {
+    content: body.content,
+    important: Boolean(body.important) || false,
+    id: id,
+  }
+  notes = notes.filter(note => note.id !== id).concat(newNote)
+
+  response.json(newNote)
+})
+
 app.get('/api/notes/:id', (request, response) => {
   const id = Number(request.params.id) 
   const note = notes.find(note => note.id === id)
@@ -96,7 +120,12 @@ app.delete('/api/notes/:id', (request, response) => {
   } 
 })
 
-const PORT = 3001
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({error:"Endpoint no encontrado"})
+}
+app.use(unknownEndpoint)
+
+const PORT = process.env.port || 3001
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
