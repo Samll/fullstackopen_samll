@@ -1,6 +1,10 @@
 const express = require('express')
 const app = express()
+var morgan = require("morgan")
 app.use(express.json())
+app.use(morgan('tiny')) 
+morgan.token('body', (request) => JSON.stringify(request.body))
+app.use(morgan('\t\tBody: :body',{skip: function (req,res) {return req.method !== "POST"}}))
 
 const requestLogger = (request, response, next) => {
     console.log("Method: ",request.method)
@@ -9,12 +13,9 @@ const requestLogger = (request, response, next) => {
     console.log("---")
     next()
 }
-app.use(requestLogger)
 
-const unknownEndpoint = (request, response) => {
-    response.status(404).send({error:"Unknown endpoint"})
-}
-//app.use(unknownEndpoint)
+//app.use(requestLogger) //Basic solution without Morgan
+
 
 
 let people = [
@@ -108,6 +109,12 @@ app.delete("/api/persons/:id", (request,response) => {
         response.status(400).end()
     } 
 })
+
+
+const unknownEndpoint = (request, response) => {
+    response.status(404).send({error:"Unknown endpoint"})
+}
+app.use(unknownEndpoint)
 
 
 const PORT = 3001
