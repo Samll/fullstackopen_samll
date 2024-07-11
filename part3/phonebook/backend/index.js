@@ -70,17 +70,45 @@ app.post('/api/persons', (request, response) => {
       error: 'Name already registered' 
     })
     }else{
-    const person = {
-      id: generateId(),
-      name: body.name,
-      number: body.number,
+      const person = {
+        id: generateId(),
+        name: body.name,
+        number: body.number,
+      }
+      people = people.concat(person)
+      response.json(person)
     }
-    people = people.concat(person)
-    response.json(person)
-    }
-    }
+  }
 
 
+})
+
+app.put('/api/persons/:id', (request, response) => {
+  const body = request.body 
+  if (!body.name || !body.number) {
+    return response.status(400).json({ 
+      error: 'Name or Number missing' 
+    })
+  }
+  const id = Number(request.params.id) 
+  console.log("ID is: ",id)
+  const person = people.filter(person => person.id === id) 
+  if(!person){
+    return response.status(400).json({ 
+      error: 'Person ID not found' 
+    })
+  }else if (person.length > 1){
+    return response.status(400).json({ 
+      error: 'Person ID appears more than once'
+    })
+  }
+  console.log("Person: ",person)
+  let updatedPerson = {...person[0], 
+    number: body.number
+  }
+  console.log("Updated Person: ",updatedPerson)
+  people = people.filter(person => person.id !== id).concat(updatedPerson) 
+  response.json(updatedPerson)
 })
 
 app.get("/api/persons/:id", (request,response) => {
