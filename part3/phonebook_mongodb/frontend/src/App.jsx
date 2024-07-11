@@ -37,8 +37,7 @@ const App = () => {
           }, 2000)
         })
         .catch(error => {
-          console.log(error)
-          setErrorMessage(`${newPerson.name} cannot be created`)
+          setErrorMessage(`${newPerson.name} cannot be created.` + error.response.data.error)
           setTimeout(() => {
             setErrorMessage(null)
     
