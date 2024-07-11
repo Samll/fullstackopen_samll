@@ -14,7 +14,8 @@
   "description": "",
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^4.19.2"
+    "express": "^4.19.2",
+    "mongoose": "^8.5.0"
   },
   "devDependencies": {
     "@flydotio/dockerfile": "^0.5.7",
