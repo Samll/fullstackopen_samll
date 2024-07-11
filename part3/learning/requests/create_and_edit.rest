@@ -1,0 +1,7 @@
+PUT http://localhost:3001/api/notes/669029fdfb0f7c50c3dfc1c2
+Content-Type: application/json
+
+{
+    "content": "Hello auto note generated",
+    "important": true
+}
