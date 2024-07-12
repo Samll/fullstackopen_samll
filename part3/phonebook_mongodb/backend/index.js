@@ -1,46 +1,46 @@
 require('dotenv').config()
 const express = require('express')
 const app = express()
-const Person = require('./models/person') 
+const Person = require('./models/person')
 const cors = require('cors')
-app.use(express.static("dist"))
+app.use(express.static('dist'))
 app.use(cors())
-var morgan = require("morgan")
+var morgan = require('morgan')
 app.use(express.json())
-app.use(morgan('tiny')) 
+app.use(morgan('tiny'))
 morgan.token('body', (request) => JSON.stringify(request.body))
-app.use(morgan('\t\tBody: :body',{skip: function (req,res) {return req.method !== "POST"}}))
+app.use(morgan('\t\tBody: :body',{ skip: function (req,res) {return req.method !== 'POST'} }))
 
 //Start Phonetool data and endpoints
 app.get('/api/persons', (request, response) => {
   Person.find({}).then(person => {
     response.json(person)
   })
-}) 
+})
 
 app.post('/api/persons', (request, response, next) => {
-  const body = request.body 
+  const body = request.body
   if (!body.name || !body.number) {
-    return response.status(400).json({ 
-      error: 'Name or Number missing' 
+    return response.status(400).json({
+      error: 'Name or Number missing'
     })
   }
-  
+
   const person = new Person({
     name: body.name,
     number: body.number
   })
-  person.save().then(savedPerson =>{
-    response.json(savedPerson);
+  person.save().then(savedPerson => {
+    response.json(savedPerson)
   })
-  .catch(error => next(error))
+    .catch(error => next(error))
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
   const body = request.body
   if (!body.name || !body.number) {
-    return response.status(400).json({ 
-      error: 'Name or Number missing' 
+    return response.status(400).json({
+      error: 'Name or Number missing'
     })
   }
   const person = {
@@ -55,25 +55,25 @@ app.put('/api/persons/:id', (request, response, next) => {
     .catch(error => next(error))
 
 })
- 
+
 
 app.get('/api/persons/:id', (request, response, next) => {
   Person.findById(request.params.id)
-  .then(person =>{
-    if (person) {
-      response.json(person)
-    } else {
-      response.status(404).end()
-    }
-  })
-  .catch(error => next(error)) 
+    .then(person => {
+      if (person) {
+        response.json(person)
+      } else {
+        response.status(404).end()
+      }
+    })
+    .catch(error => next(error))
 })
 
-app.get("/info", (request,response, next) => {
-    const dateMessage = new Date()
-    Person.find({}).then(result => {  
-      response.send(`<p>Phonebook has info for ${result.length} people</p><p>${dateMessage}</p>`)
-    })
+app.get('/info', (request,response, next) => {
+  const dateMessage = new Date()
+  Person.find({}).then(result => {
+    response.send(`<p>Phonebook has info for ${result.length} people</p><p>${dateMessage}</p>`)
+  })
     .catch(error => next(error))
 })
 
@@ -87,7 +87,7 @@ app.delete('/api/persons/:id', (request, response, next) => {
 
 
 const unknownEndpoint = (request, response) => {
-    response.status(404).send({error:"Unknown endpoint"})
+  response.status(404).send({ error:'Unknown endpoint' })
 }
 app.use(unknownEndpoint)
 
