@@ -9,7 +9,7 @@ var morgan = require('morgan')
 app.use(express.json())
 app.use(morgan('tiny'))
 morgan.token('body', (request) => JSON.stringify(request.body))
-app.use(morgan('\t\tBody: :body',{ skip: function (req,res) {return req.method !== 'POST'} }))
+app.use(morgan('\t\tBody: :body',{ skip: function (req) {return req.method !== 'POST'} }))
 
 //Start Phonetool data and endpoints
 app.get('/api/persons', (request, response) => {
@@ -79,7 +79,7 @@ app.get('/info', (request,response, next) => {
 
 app.delete('/api/persons/:id', (request, response, next) => {
   Person.findByIdAndDelete(request.params.id)
-    .then(result => {
+    .then(() => {
       response.status(204).end()
     })
     .catch(error => next(error))

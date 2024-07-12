@@ -13,10 +13,19 @@ const compat = new FlatCompat({
 })
 
 export default [
+  {
+    ignores: ['dist']
+  },
   ...compat.extends('eslint:recommended'),
   {
     languageOptions: {
-      globals: { node: true },
+      globals: {
+        node: true,
+        require: 'readonly',
+        console: 'readonly',
+        process: 'readonly',
+        module: 'readonly'
+      },
     },
     plugins: {
       '@stylistic/js': stylisticJS,
@@ -35,6 +44,6 @@ export default [
         'error', { 'before': true, 'after': true }
       ],
       'no-console': 0
-    },
-  },
+    }
+  }
 ]
