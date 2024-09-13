@@ -4,10 +4,11 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon index.js",
     "build:ui": "rm -rf dist && cd ../frontend && npm run build && cp -r dist ../backend",
-    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push"
+    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push",
+    "lint": "eslint .",
+    "test": "node --test"
   },
   "author": "Tote",
   "license": "MIT",
@@ -15,7 +16,9 @@
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
+    "eslint": "^9.7.0",
     "express": "^4.19.2",
+    "lint": "^0.8.19",
     "mongoose": "^8.5.0"
   },
   "devDependencies": {
