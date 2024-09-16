@@ -64,8 +64,25 @@ test('a new post increments the posts and data is retrieved OK', async () => {
     assert.strictEqual(newPostRead.body.title,newPost.title)
     assert.strictEqual(newPostRead.body.author,newPost.author)
     assert.strictEqual(newPostRead.body.url,newPost.url)
-    assert.strictEqual(newPostRead.body.likes,newPost.likes)
-    const blogsLast = await helper.blogsInDb()  
+    assert.strictEqual(newPostRead.body.likes,newPost.likes) 
+}) 
+
+test('a new post without likes field, autosets to 0', async () => {  
+  const newPost = {
+    title: "Create a blog post without likes",
+    author: "The code",
+    url: "The url of the code"
+  };  
+
+  const newPostResponse = await api    
+    .post(`/api/blogs/`)   
+    .send(newPost) 
+    .expect(201) 
+
+  const newPostRead = await api
+    .get(`/api/blogs/${newPostResponse.body.id}`)
+    .expect(200)  
+    assert.strictEqual(newPostRead.body.likes,0) 
 }) 
 
 after(async () => {
