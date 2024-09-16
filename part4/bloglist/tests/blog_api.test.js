@@ -40,6 +40,34 @@ test('the unique identifier property of the blog posts is named id', async () =>
   assert.strictEqual(resultBlog.body.id,blogToView.id)
 }) 
 
+test('a new post increments the posts and data is retrieved OK', async () => { 
+  const blogs = await helper.blogsInDb() 
+  const originalLength = blogs.length
+  const newPost = {
+    title: "Create a blog post",
+    author: "The code",
+    url: "The url of the code",
+    likes: 0   
+  };  
+
+  const newPostResponse = await api    
+    .post(`/api/blogs/`)   
+    .send(newPost) 
+    .expect(201)
+ 
+  const blogsUpdated = await helper.blogsInDb()
+  assert.strictEqual(blogsUpdated.length,originalLength+1) 
+
+  const newPostRead = await api
+    .get(`/api/blogs/${newPostResponse.body.id}`)
+    .expect(200) 
+    assert.strictEqual(newPostRead.body.title,newPost.title)
+    assert.strictEqual(newPostRead.body.author,newPost.author)
+    assert.strictEqual(newPostRead.body.url,newPost.url)
+    assert.strictEqual(newPostRead.body.likes,newPost.likes)
+    const blogsLast = await helper.blogsInDb()  
+}) 
+
 after(async () => {
   await mongoose.connection.close()
 })
