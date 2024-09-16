@@ -28,7 +28,7 @@ const getBlogsPerAuthor = (blogs) => {
   return dictAuthors;
 }
 
-const mostBlogs_old = (blogs) => {
+const mostBlogsX = (blogs) => {
   let dictAuthors = getBlogsPerAuthor(blogs);
   let topAuthor = null;
   let maxBlogs = 0;
@@ -44,12 +44,12 @@ const mostBlogs_old = (blogs) => {
 
 const mostBlogs = (blogs) => {
   if (blogs.length === 0) return {author:null,blogs:0};
-  const blogsByAuthor = lodash.groupBy(blogs, "author");
-  console.log(blogsByAuthor)
-  const blogsCount = lodash.map(blogsByAuthor, (author,blogList) => ({
+  const blogsByAuthor = lodash.groupBy(blogs, "author"); 
+  const blogsCount = lodash.map(blogsByAuthor, (blogList, author) => ({
     author: author,
     blogs: blogList.length
   }));
+  console.log(blogsCount)
   return(lodash.maxBy(blogsCount,"blogs"));
 }
 
