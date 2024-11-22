@@ -6,9 +6,13 @@ const mongoose = require('mongoose')
 const helper = require('./test_helper')
 const app = require('../app')
 const api = supertest(app)
+const bcrypt = require('bcrypt')
 
 const Note = require('../models/note') 
+const User = require('../models/user')
 const {info,error} = require('../utils/logger')
+
+var loginReply = "";
 
 describe('when there is initially some notes saved', () => {
   beforeEach(async () => {
@@ -62,13 +66,28 @@ describe('when there is initially some notes saved', () => {
   })
 })
 
+beforeEach(async () => {  
+  await User.deleteMany({})
+  const passwordHash = await bcrypt.hash("ToteMolaMogollon", 10)
+    const user = new User({
+       username: "root",
+       name: "Tote",
+       blogs: [],
+       passwordHash
+    })
+  
+    await user.save()
+}, 100000)
+
 describe('succeeds with valid data', () => {
   beforeEach(async () => {
     await Note.deleteMany({})
     await Note.insertMany(helper.initialNotes)
+    const loginUser = {username: "root", password: "ToteMolaMogollon"}
+    loginReply = await api.post('/api/login').send(loginUser) 
   }) 
 
-  test('a valid note can be added ', async () => {
+  test('a valid note can be added if authorized', async () => {
     const newNote = {
       content: 'async/await simplifies making async calls',
       important: true,
@@ -76,6 +95,7 @@ describe('succeeds with valid data', () => {
     await api
       .post('/api/notes')
       .send(newNote)
+      .set('Authorization', `Bearer ${loginReply.body.token}`)
       .expect(201)
       .expect('Content-Type', /application\/json/)
     const notesAtEnd = await helper.notesInDb()
@@ -91,6 +111,7 @@ describe('succeeds with valid data', () => {
     await api
       .post('/api/notes')
       .send(newNote)
+      .set('Authorization', `Bearer ${loginReply.body.token}`)
       .expect(400)
     const notesAtEnd = await helper.notesInDb()
     assert.strictEqual(notesAtEnd.length, helper.initialNotes.length)

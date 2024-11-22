@@ -2,6 +2,9 @@ POST http://localhost:3001/api/notes
 Content-Type: application/json
 
 {
-    "content": "Hello auto note generated",
-    "important": true
+    "content": "Hello auto note generated2",
+    "important": true,
+    "userId": "66f2d4592a6dfd79dbc2b7b2"
 }
+
+ 
