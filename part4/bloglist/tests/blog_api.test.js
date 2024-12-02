@@ -9,8 +9,6 @@ const api = supertest(app)
 
 const Blog = require('../models/blog') 
 
-
-
 describe('Working with existing Blogs', () => { 
   beforeEach(async () => {
     await Blog.deleteMany({})
