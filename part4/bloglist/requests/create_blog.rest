@@ -1,8 +1,9 @@
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ikpvc2UiLCJpZCI6IjY3NGU0Mjk3Y2UzZDY1ZmFmZjM0OWU1ZSIsImlhdCI6MTczMzI1OTAzMiwiZXhwIjoxNzMzMjYyNjMyfQ.-PoD7ngDQfxJBL0hTyW6I1IvEdAshGOEMFgOlpFQiCE
 
 {
-    "title": "Mi primer blog Random aUser21",
+    "title": "Mi primer blog login",
     "author": "Tote guapote",
     "url": "www.flleida.cat",
     "likes": 999

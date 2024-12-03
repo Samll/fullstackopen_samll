@@ -1,5 +1,6 @@
 POST http://localhost:3001/api/notes
-Content-Type: application/json
+Content-Type: application/json 
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJpZCI6IjY2ZjJkNDU5MmE2ZGZkNzlkYmMyYjdiMiIsImlhdCI6MTczMzI1ODc4MywiZXhwIjoxNzMzMjYyMzgzfQ.2ZtckADrlGfaqk6x8x-9QeeGVaH9uQ0ZmE6grJGQFOI
 
 {
     "content": "Hello auto note generated2",

@@ -1,6 +1,15 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 const User = require('../models/user')
+const jwt = require('jsonwebtoken')
+
+const getTokenFrom = request => {
+  const authorization = request.get('authorization')
+  if (authorization && authorization.startsWith('Bearer ')) {
+    return authorization.replace('Bearer ', '')
+  }
+  return null
+}
 
 blogsRouter.get('/', async(request, response) => { 
   const blogs = await Blog.find({}).populate("user", {username:1, name:1, id:1});
@@ -17,14 +26,17 @@ blogsRouter.get('/:id', async (request, response) => {
 })
 
 blogsRouter.post('/', async(request, response, next) => {
+  const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET)
+  if (!decodedToken.id) {
+    return response.status(401).json({ error: 'token invalid' })
+  }
+  const user = await User.findById(decodedToken.id)
   
   if((!request.body.title)||(!request.body.url)){
     response.status(400).end()
   }if(!request.body.likes){
     request.body.likes = 0;
   }
-  const users = await User.find({});
-  const user = users[0];
   request.body.user = user.id;
     
   const blog = new Blog(request.body)
@@ -43,7 +55,7 @@ blogsRouter.delete('/:id', async (request, response) => {
 blogsRouter.put('/:id', async (request,response) => {
   const body = request.body
   if(!body.likes){
-    response.status(400).end()
+    response.status(400).json({ error: 'Cannot edit without likes field' }).end()
   }
   const oldBlog = await Blog.findById(request.params.id)
   const blog = {
