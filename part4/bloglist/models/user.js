@@ -5,10 +5,15 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true
-},
+  },
   name:  String,
   passwordHash:  String,
- 
+  blogs: [
+      {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Blog'
+      }
+  ],
 })
 
 userSchema.set('toJSON', {
@@ -20,5 +25,6 @@ userSchema.set('toJSON', {
   }
 }) 
 
+const User = mongoose.model('User', userSchema)
 
-module.exports = mongoose.model('User', userSchema)
+module.exports = User

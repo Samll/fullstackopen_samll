@@ -2,7 +2,7 @@ POST http://localhost:3003/api/blogs
 Content-Type: application/json
 
 {
-    "title": "Mi primer blog Random User",
+    "title": "Mi primer blog Random aUser21",
     "author": "Tote guapote",
     "url": "www.flleida.cat",
     "likes": 999
