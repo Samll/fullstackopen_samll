@@ -8,6 +8,7 @@ const app = require('../app')
 const api = supertest(app)
 
 const Blog = require('../models/blog') 
+const User = require('../models/user') 
 
 describe('Working with existing Blogs', () => { 
   beforeEach(async () => {
@@ -155,6 +156,56 @@ describe('Creating Blogs', () => {
       .get(`/api/blogs/${newPostResponse.body.id}`)
       .expect(200)  
       assert.strictEqual(newPostRead.body.likes,0) 
+  }) 
+
+  test('A new post contains user data in json', async () => {   
+    await User.deleteMany({})
+    const newUser = {
+      username: "testuser",
+      name: "Test User",
+      password: "testpassword",
+    }; 
+
+    const userResponse = await api
+    .post('/api/users/')
+    .send(newUser)
+    .expect(201);
+
+    const userID = userResponse.body.id; 
+    const newPost = {
+      title: "Create a blog post and check user is associated",
+      author: "The code",
+      url: "The url of the code",
+      likes: 345,
+      user: userID
+    };  
+
+    const newPostResponse = await api    
+      .post(`/api/blogs/`)   
+      .send(newPost) 
+      .expect(201) 
+
+    const newPostRead = await api
+      .get(`/api/blogs/${newPostResponse.body.id}`)
+      .expect(200)  
+
+      const newUserResponse = await api
+      .get(`/api/users/${userID}`) 
+      .expect(200);
+ 
+    // Validate content on Blog shows User Data
+    const userInPost = newPostRead.body.user;
+    assert.ok(userInPost, "User data should be present in the post");
+    assert.strictEqual(userInPost.username, newUser.username, "User's username should match");
+    assert.strictEqual(userInPost.name, newUser.name, "User's name should match");
+
+    // Validate User Data now contains Post
+    const postInUser = newUserResponse.body.blogs[0]; 
+    assert.ok(postInUser, "Post data should be present in the user profile");
+    assert.strictEqual(postInUser.title, newPostResponse.body.title, "Post's title should match");
+    assert.strictEqual(postInUser.author, newPostResponse.body.author, "Post's author should match");
+    assert.strictEqual(postInUser.url, newPostResponse.body.url, "Post's url should match");
+    assert.strictEqual(postInUser.id, newPostResponse.body.id, "Post's id should match");
   }) 
 
 })
