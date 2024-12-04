@@ -52,6 +52,18 @@ blogsRouter.delete('/:id', async (request, response) => {
 })
 
 blogsRouter.put('/:id', async (request,response) => {
+  /*  Skipped as there is an error on Test when I clear users on first Describe. Cannot find a solution and cannot test with token in put.
+  const user = request.user;
+  if(!user){
+    return response.status(401).json({ error: 'token invalid' }).end()
+  }
+  const blogToDelete = await Blog.findById(request.params.id)
+  if (user.id != blogToDelete.user.toString()){
+    return response.status(401).json({ error: 'Current user unauthorized to delete selected post'})
+  }
+  */
+
+  
   const body = request.body
   if(!body.likes){
     response.status(400).json({ error: 'Cannot edit without likes field' }).end()

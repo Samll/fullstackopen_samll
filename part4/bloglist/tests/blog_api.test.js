@@ -12,7 +12,36 @@ const User = require('../models/user')
 
 var userForPostActions = helper.initialUsers[0];
 var userToken;
-describe('Working with existing Blogs', () => { 
+
+describe('Working with existing Blogs for Get', () => { 
+  beforeEach(async () => {
+    await Blog.deleteMany({})
+    await Blog.insertMany(helper.initialBlogs) 
+  })
+
+  test('blog can be GET from api', async () => {
+    const blogs = await api
+      .get('/api/blogs')
+      .expect(200)
+      .expect('Content-Type', /application\/json/) 
+    assert.strictEqual(blogs.body.length, helper.initialBlogs.length)
+  })
+
+  test('The unique identifier property of the blog posts is named id', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+
+    const blogToView = blogsAtStart[0]
+
+    const resultBlog = await api    
+      .get(`/api/blogs/${blogToView.id}`)    
+      .expect(200)    
+      .expect('Content-Type', /application\/json/)
+
+    assert.strictEqual(resultBlog.body.id,blogToView.id)
+  }) 
+})
+
+describe('Working with existing Blogs for Put', () => { 
   beforeEach(async () => {
     await Blog.deleteMany({})
     await Blog.insertMany(helper.initialBlogs) 
