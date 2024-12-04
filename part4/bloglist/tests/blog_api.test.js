@@ -320,7 +320,7 @@ describe('deletion of a blog', () => {
         .expect(401)
         .expect('Content-Type', /application\/json/) 
   
-        assert(deleteResponse.body.error === 'Current user unauthorized to delete selected post ')
+        assert(deleteResponse.body.error === 'Current user unauthorized to delete selected post')
   
         const blogsAtEnd = await helper.blogsInDb()
     
@@ -368,7 +368,7 @@ describe('deletion of a blog', () => {
           .expect(401)
           .expect('Content-Type', /application\/json/) 
     
-        assert(deleteResponse.body.error === 'Current user unauthorized to delete selected post ')
+        assert(deleteResponse.body.error === 'Current user unauthorized to delete selected post')
   
         var blogsAtEnd = await helper.blogsInDb()
     

@@ -18,14 +18,13 @@ blogsRouter.get('/:id', async (request, response) => {
 })
 
 blogsRouter.post('/', async(request, response, next) => {
-  const decodedToken = jwt.verify(request.token, process.env.SECRET)
-  if (!decodedToken.id) {
-    return response.status(401).json({ error: 'token invalid' })
+  const user = request.user;
+  if(!user){
+    return response.status(401).json({ error: 'token invalid' }).end()
   }
-  const user = await User.findById(decodedToken.id)
   
   if((!request.body.title)||(!request.body.url)){
-    response.status(400).end()
+    response.status(400).json({ error: 'missing title or url ' }).end()
   }if(!request.body.likes){
     request.body.likes = 0;
   }
@@ -39,14 +38,14 @@ blogsRouter.post('/', async(request, response, next) => {
   response.status(201).json(postedBlog) 
 })
 
-blogsRouter.delete('/:id', async (request, response) => { 
-  const decodedToken = jwt.verify(request.token, process.env.SECRET)
-  if (!decodedToken.id) {
-    return response.status(401).json({ error: 'token invalid' })
+blogsRouter.delete('/:id', async (request, response) => {
+  const user = request.user;
+  if(!user){
+    return response.status(401).json({ error: 'token invalid' }).end()
   }
   const blogToDelete = await Blog.findById(request.params.id)
-  if (decodedToken.id != blogToDelete.user.toString()){
-    return response.status(401).json({ error: 'Current user unauthorized to delete selected post '})
+  if (user.id != blogToDelete.user.toString()){
+    return response.status(401).json({ error: 'Current user unauthorized to delete selected post'})
   }
   await Blog.findByIdAndDelete(request.params.id) 
   response.status(204).end()

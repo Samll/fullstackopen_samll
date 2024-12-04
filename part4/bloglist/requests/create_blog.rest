@@ -1,9 +1,9 @@
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlRvdGUiLCJpZCI6IjY3NTA4OTIzYTU0NzNjY2IwYzQyOTRmZSIsImlhdCI6MTczMzMzMTQ0MCwiZXhwIjoxNzMzMzM1MDQwfQ.zmbAM8u0n4E_KbIAQovseHTem99Bek90OVGonx4eRdI
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ikpvc2UiLCJpZCI6IjY3NGU0Mjk3Y2UzZDY1ZmFmZjM0OWU1ZSIsImlhdCI6MTczMzM0NDkzMywiZXhwIjoxNzMzMzQ4NTMzfQ.dWM0tJXkn6O3iVroNJ6jkRFEIkb7sqavQMZN_edfY-E
 
 {
-    "title": "MReal Tote",
+    "title": "MReasl Tote",
     "author": "Tote guapote",
     "url": "www.flleida.cat",
     "likes": 999
