@@ -251,29 +251,145 @@ describe('Creating Blogs', () => {
 
 })
 
-describe('deletion of a blog', () => {
+describe('deletion of a blog', () => {  
   beforeEach(async () => {
+    await User.deleteMany({})
+    await helper.createUserWithPasswordHash()  
     await Blog.deleteMany({})
-    await Blog.insertMany(helper.initialBlogs) 
+    await Blog.insertMany(helper.createInitialBlogsLinkedToUser(userForPostActions)) 
+    const loggedUser = await api
+                        .post('/api/login')
+                        .send(userForPostActions)          
+    userToken = loggedUser.body.token;  
   })
 
-  test('Delete and existing element returns 204 and reduces amount of blogs', async () =>{
+  test('Delete without token raises error', async () =>{   
     const blogsStart = await helper.blogsInDb() 
     const blogID = blogsStart[0].id
   
-    await api.
-      delete(`/api/blogs/${blogID}`)
-      .expect(204)
+    const deleteResponse = await api
+      .delete(`/api/blogs/${blogID}`)
+      .expect(401)
+      .expect('Content-Type', /application\/json/) 
+
+      assert(deleteResponse.body.error === 'token invalid')
 
       const blogsAtEnd = await helper.blogsInDb()
   
       const contents = blogsAtEnd.map(r => r.id)
-      assert(!contents.includes(blogID))
+      assert(contents.includes(blogID))
   
-      assert.strictEqual(blogsAtEnd.length, blogsStart.length - 1)
+      assert.strictEqual(blogsAtEnd.length, blogsStart.length)
     })
- 
 
+    test('Delete other user post raises error', async () =>{ 
+      // Log as user 0
+      const loggedUser0 = await api
+        .post('/api/login')
+        .send(helper.initialUsers[0])          
+      const userToken0 = loggedUser0.body.token;  
+
+      //Post with user 0
+      const newPost = {
+        title: "Create a blog by user 0 to be deleted by user 1",
+        author: "The code",
+        url: "The url of the code"
+      };  
+  
+      const newPostResponse = await api    
+        .post(`/api/blogs/`)   
+        .set({ Authorization: `Bearer ${userToken0}` })
+        .send(newPost) 
+        .expect(201) 
+        .expect('Content-Type', /application\/json/) 
+    
+      
+      const blogsStart = await helper.blogsInDb() 
+      const blogID = newPostResponse.body.id
+      
+      // Log as user 1
+      const loggedUser1 = await api
+        .post('/api/login')
+        .send(helper.initialUsers[1])          
+      const userToken1 = loggedUser1.body.token; 
+      
+      //Try to delete with User 1 a post from User 0
+      const deleteResponse = await api
+        .delete(`/api/blogs/${blogID}`)
+        .set({ Authorization: `Bearer ${userToken1}` })
+        .expect(401)
+        .expect('Content-Type', /application\/json/) 
+  
+        assert(deleteResponse.body.error === 'Current user unauthorized to delete selected post ')
+  
+        const blogsAtEnd = await helper.blogsInDb()
+    
+        const contents = blogsAtEnd.map(r => r.id)
+        assert(contents.includes(blogID))
+    
+        assert.strictEqual(blogsAtEnd.length, blogsStart.length)
+      })
+
+      test('Delete other user post raises error, proper user gives a success', async () =>{ 
+        // Log as user 0
+        const loggedUser0 = await api
+          .post('/api/login')
+          .send(helper.initialUsers[0])          
+        const userToken0 = loggedUser0.body.token;  
+  
+        //Post with user 0
+        const newPost = {
+          title: "Create a blog by user 0 to be deleted by user 1",
+          author: "The code",
+          url: "The url of the code"
+        };  
+    
+        const newPostResponse = await api    
+          .post(`/api/blogs/`)   
+          .set({ Authorization: `Bearer ${userToken0}` })
+          .send(newPost) 
+          .expect(201) 
+          .expect('Content-Type', /application\/json/) 
+      
+        
+        const blogsStart = await helper.blogsInDb() 
+        const blogID = newPostResponse.body.id
+        
+        // Log as user 1
+        const loggedUser1 = await api
+          .post('/api/login')
+          .send(helper.initialUsers[1])          
+        const userToken1 = loggedUser1.body.token; 
+        
+        //Try to delete with User 1 a post from User 0
+        const deleteResponse = await api
+          .delete(`/api/blogs/${blogID}`)
+          .set({ Authorization: `Bearer ${userToken1}` })
+          .expect(401)
+          .expect('Content-Type', /application\/json/) 
+    
+        assert(deleteResponse.body.error === 'Current user unauthorized to delete selected post ')
+  
+        var blogsAtEnd = await helper.blogsInDb()
+    
+        var contents = blogsAtEnd.map(r => r.id)
+        assert(contents.includes(blogID))
+    
+        assert.strictEqual(blogsAtEnd.length, blogsStart.length)
+      
+        //Now try with user 0
+        await api
+          .delete(`/api/blogs/${blogID}`)
+          .set({ Authorization: `Bearer ${userToken0}` })
+          .expect(204) 
+    
+        blogsAtEnd = await helper.blogsInDb()
+      
+        contents = blogsAtEnd.map(r => r.id)
+        assert(!contents.includes(blogID))
+    
+        assert.strictEqual(blogsAtEnd.length, blogsStart.length - 1)
+        })
 })
 
 after(async () => {

@@ -32,7 +32,13 @@ const initialUsers = [
     name: "Paquito",
     password: "PassPaquito",
     notes: [ ]
-    }
+    },
+    {
+      username: "Tote",
+      name: "Totete",
+      password: "PassTote",
+      notes: [ ]
+      }
 ]
 
 const blogsInDb = async () => {
@@ -46,16 +52,17 @@ const usersInDb = async () => {
 }
 
 const createUserWithPasswordHash = async () => {
-  const passwordHash = await bcrypt.hash("PassPaquito", 10)
-  const user = new User({
-    username: initialUsers[0].username,
-    name: initialUsers[0].name,
-    notes: initialUsers[0].notes,
-    passwordHash: passwordHash
-  })
-  await user.save() 
-  return user
-}
+  for (const userData of initialUsers) {
+    const passwordHash = await bcrypt.hash(userData.password, 10);
+    const user = new User({
+      username: userData.username,
+      name: userData.name,
+      notes: userData.notes,
+      passwordHash: passwordHash
+    });
+    await user.save();
+  }
+};
 
 const createInitialBlogsLinkedToUser = async (user) => {
   const associatedBlogs = initialBlogs.map(blog => blog.user = user.id)
